@@ -1,9 +1,6 @@
 
 const play = require('./commands/play')
 
-
-queue = new Map()
-
 const parser = (command, msg, args, section) => {
     command = String(command).replace('*', '')
     console.log('hey!')
