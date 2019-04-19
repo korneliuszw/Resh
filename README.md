@@ -6,6 +6,13 @@ At this moment Resh can play music from youtube, create one-time queue.
 However, more features are coming very soon.
 __If you have problem with something or want to suggest new feature - go on, I'm open for new suggestions.__
 
+# Current working commands
+(Prefix '*')
+
+__'*play'__ - Plays music from youtube. Currently only supporting single songs. Usage {*play name | url}'. </br>
+__'*quit'__ - Quit voice channel - stop playing music. </br>
+__'*skip'__ - Skip song and play next in queue.
+
 
 # Installation and usage
 
@@ -20,6 +27,7 @@ To obtain youtube api key go to the [google developer console](https://console.d
 Once you have all your tokens, create new file called '.env' (make sure that it doesn't have any additional extensions, copy below
 text and after = replace everything in line with your token (be sure it doesn't have any spaces after =).
 Make sure that .env file is located in same folder as main.js.
+To add bot to your server [check this](https://discordapp.com/developers/docs/topics/oauth2#bots)
 
 ```
 BOT_TOKEN=(insert your discord token here)
@@ -27,13 +35,6 @@ YT_TOKEN=(insert your youtube api key here)
 ```
 
 To start bot you just need to type ``` npm start ``` or ``` node main.js ```
-# Current working commands
-(Prefix '*')
-
-__'*play'__ - Plays music from youtube. Currently only supporting single songs. Usage {*play name | url}'. </br>
-__'*quit'__ - Quit voice channel - stop playing music. </br>
-__'*skip'__ - Skip song and play next in queue.
-
 
 # Ongoing features
 
@@ -46,3 +47,10 @@ __'*skip'__ - Skip song and play next in queue.
 - [ ] Random video from youtube (not sure about it yet)
 - [ ] Coin flip
 And much more things!
+
+# Issues:
+
+- There is some weird error on my AWS instance while installing npm modules. Not sure if it is some problem with my package.json or only instance.
+
+- Tester reported that in the middle of music bot stops. I didn't get this error on mine server.
+- Audio is in pretty bad quality. I will try my best to improve it.
