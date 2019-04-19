@@ -5,6 +5,7 @@
 const discord = require('discord.js')
 const stream = require('ytdl-core')
 const youtube = require('simple-youtube-api')
+require('dotenv').config()
 const ytapi = new youtube(String(process.env.YT_TOKEN))
 
 //Music queue

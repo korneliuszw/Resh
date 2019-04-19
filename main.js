@@ -2,6 +2,7 @@ const Discord = require('discord.js')
 const commands = require('./models/commands')
 const bot = new Discord.Client()
 const youtube = require('./commands/youtube')
+require('dotenv').config()
 
 //Get bot token from enviroment variable
 bot.login(String(process.env.BOT_TOKEN)).catch((error) => console.log(error))

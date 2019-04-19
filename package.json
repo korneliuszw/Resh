@@ -19,6 +19,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "discord.js": "^11.4.2",
+    "dotenv": "^7.0.0",
     "ffmpeg-binaries": "^4.0.0",
     "opusscript": "0.0.6",
     "simple-youtube-api": "^5.1.1",
