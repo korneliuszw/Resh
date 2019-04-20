@@ -11,8 +11,8 @@ __If you have problem with something or want to suggest new feature - go on, I'm
 
 __'*play'__ - Plays music from youtube. Currently only supporting single songs. Usage {*play name | url}'. </br>
 __'*quit'__ - Quit voice channel - stop playing music. </br>
-__'*skip'__ - Skip song and play next in queue.
-
+__'*skip'__ - Skip song and play next in queue. </br>
+__'*find'__ - Find song from youtube by keywords 
 
 # Installation and usage
 
