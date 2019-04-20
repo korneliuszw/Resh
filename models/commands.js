@@ -26,7 +26,7 @@ const commands = {
     '*find': {
         help: 'Find a video using keywoards',
         section: 'youtube',
-        func: (msg) => {
+        func: (msg, words) => {
             methods.youtube.find(words, msg, true)
         }
     },
