@@ -1,12 +1,12 @@
 const methods = {
     youtube: require('../commands/youtube.js'),
-    help: null
 }
 
 //All commands avaible here. Use to check if message is command and go to the section and then parse it to the method with same name ex. if message starts with *play - go to section youtube(../commands/youtube.js)     
 const commands = {
     '*play': {
-        help: 'Play music from youtube. Currently only supporting single songs.\n Usage {*play name|url}',
+        help: 'Play music from youtube. Currently only supporting single songs',
+        usage: '*play name|url',
         func: (msg, song) => {
             methods.youtube.play(msg, song)
         }
@@ -25,16 +25,25 @@ const commands = {
     },
     '*find': {
         help: 'Find a video using keywoards',
-        section: 'youtube',
         func: (msg, words) => {
             methods.youtube.find(words, msg, true)
         }
     },
-    '*random': {
-        help: 'Find random video on youtube. NOT IMPLEMENTED YET!',
-    },
     '*help': {
-        help: 'Get all commands with method of usage\n .\n Usage {*help}',
-    }
+        help: 'Get all commands with method of usage',
+        func: (msg) => {
+            mess = 'Command | Usage\n'
+            Object.entries(commands).forEach((command) => {
+                mess += `** ${command[0]} ** | ${command[1].help} `
+                if (command[1].usage) {
+                    sp = command[1].usage.split(' ')
+                    mess += ` ** ${sp[0]} _${sp[1]}_ ** `
+                }
+                mess += '\n'
+            })
+            msg.author.send(mess)
+
+        }
+    },
 }
 module.exports = commands

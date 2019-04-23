@@ -1,6 +1,5 @@
 
-//Import all requried libraries 
-const discord = require('discord.js')
+//Import all requried libraries.
 const stream = require('ytdl-core')
 const youtube = require('simple-youtube-api')
 require('dotenv').config()
@@ -16,7 +15,7 @@ const play = async function (msg, song) {
         const voiceChannel = msg.member.voiceChannel
         if (!voiceChannel) return msg.reply("Hey dude, it's not like I don't want to play music for you, but you have just not connected to voice channel")
         const perms = voiceChannel.permissionsFor(msg.client.user)
-        if (perms.has('CONNECT') && perms.has('SPEAK')) {
+        if (perms.has('CONNECT') && perms.has('SPEAK') && (!voiceChannel.full || perms.has('ADMINISTRATOR') || perms.has('MOVE_MEMBERS'))) {
             //Find song provided as arg
             const songplaying = await find(song)
             //Check for existing play queue
@@ -34,6 +33,9 @@ const play = async function (msg, song) {
             playSongs(msg.guild)
         }
         else {
+            if (voiceChannel.full) {
+                return msg.reply('Your channel is full')
+            }
             return msg.reply('I need more permissions to play music for you')
         }
     }
@@ -76,19 +78,23 @@ async function playSongs(guild) {
             q.text.send('Added to queue!')
         }
         else {
-            console.log('hey,there')
             //Start voice channel connection
             connection = await q.voice.join()
+
+
             q.connection = connection //Add connection to the queue nap
             q.text.send('Playing: ' + q.songs[0]) //Send ongoing song to the text channel
             q.status = 'playing' //Change status 
-            const dispatcher = connection.playStream(stream(q.songs[0]) //Init playstream from first link provided in queue
+            const dispatcher = connection.playStream(stream(q.songs[0], {
+                quality: 'highestaudio',
+                filter: 'audioonly'
+            }) //Init playstream from first link provided in queue
                 .on('end', () => {
                     q.status = 'skipping'
                     //Delete finished song from queue and play queue again
                     q.songs.shift()
                     playSongs(guild)
-                }))
+                }), { bitrate: 'auto' })
         }
     }
     catch (e) {
@@ -100,7 +106,6 @@ async function playSongs(guild) {
 async function find(song, msg = undefined, searchOnly = false) {
     regex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/gm //regex for checking is arg url
     if (new RegExp(regex).test(song.trim())) { //If arg is url - add it to the queue
-        console.log('song is an url')
         if (searchOnly && msg) msg.reply('Looks like you already have your video, so why do you want me to find it?')
         return {
             title: '',
@@ -109,7 +114,6 @@ async function find(song, msg = undefined, searchOnly = false) {
     }
     //If arg is not url - search for video with provided name and then return link.
     const aw = await ytapi.searchVideos(song, 1).then((res) => {
-        console.log(res[0].id)
         return {
             title: res[0].title,
             link: 'https://www.youtube.com/watch?v=' + res[0].id
@@ -125,7 +129,7 @@ async function skip(msg) {
     q = queue.get(msg.guild)
     q.songs.shift() //Delete first (playing) song from queue
     q.status = 'skipping'
-    if (!q) { return console.log('Bot is not playing') }
+    if (!q) { return msg.reply('Bot is not playing') }
     if (!q.songs || q.songs.length == 0) { //If queue is empty - leave channel
         q.connection.disconnect()
         queue.delete(msg.guild)
@@ -141,7 +145,7 @@ async function skip(msg) {
 async function quit(msg) {
     //Quit channel
     q = queue.get(msg.guild)
-    if (!q) { return console.log('Bot is not playing') }
+    if (!q) { return msg.reply('Bot is not playing') }
     q.connection.disconnect()
     queue.delete(msg.guild) //Remove server from queue
 }
