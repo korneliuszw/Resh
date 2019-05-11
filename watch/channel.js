@@ -25,9 +25,8 @@ class VoiceWatchers {
         else {
             //Read all configs in a config directory
             fs.readdir('configs', (err, files) => {
-                if (err) return console.error(err)
+                if (err) { console.error(err); return fs.mkdir('configs', (err) => console.error(err)) }
                 files.forEach(file => {
-                    console.log(file)
                     fs.readFile('configs/' + file, (err, data) => {
                         if (err) console.error(err)
                         else {
