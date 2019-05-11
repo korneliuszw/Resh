@@ -38,19 +38,17 @@ To start bot you just need to type ``` npm start ``` or ``` node main.js ```
 
 # Ongoing features
 
-- [ ] **Better audio quality**
+- [x] **Better audio quality** (?)
 - [ ] Better performance
-- [ ] **Help command**
+- [x] **Help command**
 - [ ] **Admin commands**
 - [ ] Implement welcome message
 - [ ] Special voice channel for bot which name is equal to current song.
 - [ ] Random video from youtube (not sure about it yet)
-- [ ] Coin flip
+- [ ] Custom requests
 And much more things!
 
 # Issues:
 
-- There is some weird error on my AWS instance while installing npm modules. Not sure if it is some problem with my package.json or only instance.
-
 - Tester reported that in the middle of music bot stops. I didn't get this error on mine server.
-- Audio is in pretty bad quality. I will try my best to improve it.
+- Sometimes, but rarely, songs stop in middle, restarting bot should fix this, but I'm working on any possible fix.

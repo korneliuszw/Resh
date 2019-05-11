@@ -1,5 +1,6 @@
 const methods = {
     youtube: require('../commands/youtube.js'),
+    admin: require('../commands/setup.js')
 }
 
 //All commands avaible here. Use to check if message is command and go to the section and then parse it to the method with same name ex. if message starts with *play - go to section youtube(../commands/youtube.js)     
@@ -31,7 +32,7 @@ const commands = {
     },
     '*help': {
         help: 'Get all commands with method of usage',
-        func: (msg) => {
+        func: async (msg) => {
             mess = 'Command | Usage\n'
             Object.entries(commands).forEach((command) => {
                 mess += `** ${command[0]} ** | ${command[1].help} `
@@ -45,5 +46,15 @@ const commands = {
 
         }
     },
+    '*set_channel': {
+        func(msg, channel) {
+
+        }
+    },
+    '*setup': {
+        func: async (msg) => {
+            methods.admin.setup(msg)
+        }
+    }
 }
 module.exports = commands

@@ -8,29 +8,42 @@ const ytapi = new youtube(String(process.env.YT_TOKEN))
 //Music queue
 var queue = new Map()
 
+const clearQueue = (guild) => { //Clear server's music queue
+    q = queue.get(guild)
+    if (q.dispatcher) {
+        q.dispatcher.end() //If dispatcher is avaible - end it
+    }
+    if (q.connection) {
+        q.connection.disconnect() //If connected - disconnect
+    }
+    queue.delete(guild)
+}
 // Function for play command
 const play = async function (msg, song) {
     try {
         //Check check for voice channel and permissions to join and speak
         const voiceChannel = msg.member.voiceChannel
-        if (!voiceChannel) return msg.reply("Hey dude, it's not like I don't want to play music for you, but you have just not connected to voice channel")
+        if (!voiceChannel) return msg.reply("Hey dude, it's not like I don't want to play music for you, but you are just not connected to voice channel")
         const perms = voiceChannel.permissionsFor(msg.client.user)
         if (perms.has('CONNECT') && perms.has('SPEAK') && (!voiceChannel.full || perms.has('ADMINISTRATOR') || perms.has('MOVE_MEMBERS'))) {
             //Find song provided as arg
-            const songplaying = await find(song)
+            if (!song) {
+                return msg.reply("You need to provide your song's name/url")
+            }
+            const songplaying = await find(song, msg)
             //Check for existing play queue
-            if (!queue.get(msg.guild)) {
+            if (!queue.get(msg.guild.id)) {
                 //Create new queue
-                await createQueue(msg.channel, voiceChannel, msg.guild, 4).catch(e => { throw new Error(e) })
+                await createQueue(msg.channel, voiceChannel, msg.guild.id, 4).catch(e => { throw new Error(e) })
                 //Get queue and add current song to it
-                que = queue.get(msg.guild)
+                que = queue.get(msg.guild.id)
                 que.songs.push(songplaying.link)
             }
             else {
                 //If queue exists, add requested song to it
-                insertIntoQueue(songplaying.link, msg.guild).catch(e => { throw new Error(e) })
+                insertIntoQueue(songplaying.link, msg.guild.id).catch(e => { throw new Error(e) })
             }
-            playSongs(msg.guild)
+            playSongs(msg.guild.id)
         }
         else {
             if (voiceChannel.full) {
@@ -79,17 +92,19 @@ async function playSongs(guild) {
         }
         else {
             //Start voice channel connection
-            connection = await q.voice.join()
-
-
-            q.connection = connection //Add connection to the queue nap
+            q.connection = await q.voice.join() //Add connection to the queue nap
+            console.log(q.songs[0])
             q.text.send('Playing: ' + q.songs[0]) //Send ongoing song to the text channel
             q.status = 'playing' //Change status 
-            const dispatcher = connection.playStream(stream(q.songs[0], {
+            q.dispatcher = q.connection.playStream(stream(q.songs[0], {
                 quality: 'highestaudio',
                 filter: 'audioonly'
             }) //Init playstream from first link provided in queue
                 .on('end', () => {
+                    console.log('test')
+                    if (q.status = 'stop') {
+
+                    }
                     q.status = 'skipping'
                     //Delete finished song from queue and play queue again
                     q.songs.shift()
@@ -98,6 +113,7 @@ async function playSongs(guild) {
         }
     }
     catch (e) {
+        clearQueue(guild)
         console.log(e)
     }
 }
@@ -118,7 +134,7 @@ async function find(song, msg = undefined, searchOnly = false) {
             title: res[0].title,
             link: 'https://www.youtube.com/watch?v=' + res[0].id
         }
-    }).catch(e => console.log(e))
+    }).catch(e => { console.log(e); clearQueue(msg.guild) })
     if (searchOnly && msg) return msg.reply('Title: ' + aw.title + '\n Link: ' + aw.link) //For use in *find command, searchOnly defines is method called from command (true) or play (false)
     return aw
 
@@ -126,17 +142,16 @@ async function find(song, msg = undefined, searchOnly = false) {
 
 async function skip(msg) {
     //Skip currently playing song
-    q = queue.get(msg.guild)
+    q = queue.get(msg.guild.id)
     q.songs.shift() //Delete first (playing) song from queue
     q.status = 'skipping'
     if (!q) { return msg.reply('Bot is not playing') }
     if (!q.songs || q.songs.length == 0) { //If queue is empty - leave channel
-        q.connection.disconnect()
-        queue.delete(msg.guild)
+        clearQueue(msg.guild.id)
     }
     else { //Else - end current playing song and start new
         q.connection.dispatcher.end('skipping')
-        playSongs(msg.guild)
+        playSongs(msg.guild.id)
     }
 
 }
@@ -144,10 +159,7 @@ async function skip(msg) {
 
 async function quit(msg) {
     //Quit channel
-    q = queue.get(msg.guild)
-    if (!q) { return msg.reply('Bot is not playing') }
-    q.connection.disconnect()
-    queue.delete(msg.guild) //Remove server from queue
+    clearQueue(msg.guild.id)
 }
 
 
@@ -155,5 +167,6 @@ module.exports = {
     play: play,
     quit: quit,
     skip: skip,
-    find: find
+    find: find,
+    clearQueue
 }
